@@ -1,6 +1,12 @@
 # Tilling Survey for ILR
 
-Run locally with
+Install locally by executing
+
+```
+npm install
+```
+
+then run with
 
 ```
 npm run dev
