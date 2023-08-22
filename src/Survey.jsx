@@ -1,8 +1,7 @@
-// src/Survey.js
 import React, { useState } from "react";
 import surveyQuestions from "./questions";
 
-const Survey = () => {
+const Survey = ({ onBack }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [responses, setResponses] = useState(Array(surveyQuestions.length).fill({}));
 
@@ -67,6 +66,7 @@ const Survey = () => {
       <h1>Umfrage</h1>
       {surveyQuestions[currentPage].map(renderQuestion)}
       <div>
+        {currentPage == 0 && <button onClick={onBack}>Zur Einverständniserklärung</button>}
         {currentPage > 0 && <button onClick={handlePreviousPage}>Vorherige Seite</button>}
         {currentPage < surveyQuestions.length - 1 && <button onClick={handleNextPage}>Nächste Seite</button>}
         {currentPage === surveyQuestions.length - 1 && <button onClick={handleSubmit}>Abschicken</button>}
