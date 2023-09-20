@@ -21,9 +21,6 @@ const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
   const handleComplete = () => {
     if (mapMarks.length >= minMapMarks) {
       onComplete(mapMarks);
-    } else {
-      // Handle the case where not enough map marks are made
-      // You can show an error message or take other actions
     }
   };
 
@@ -46,16 +43,16 @@ const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
   // Function to generate fixed questions for a mark
   const generateMarkQuestions = (markNumber) => {
     const questions = [];
-    // Define your fixed set of questions here
-    // You can create questions dynamically if needed
+    // Define questions for the marked farms here
+    // Currently mostly placeholder
     questions.push({
       id: `mark_${markNumber}_question_1`,
-      text: `Question 1 for Mark ${markNumber + 1}`,
+      text: `Frage 1 für Feld ${markNumber + 1}`,
       type: "text",
     });
     questions.push({
       id: `mark_${markNumber}_question_2`,
-      text: `Question 2 for Mark ${markNumber + 1}`,
+      text: `Frage 2 für Feld ${markNumber + 1}`,
       type: "text",
     });
     // Add more questions as needed
@@ -67,16 +64,15 @@ const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
       // Page 1: Map Marking
       return (
         <div>
-          <h2>Map Marking</h2>
+          <h2>Felder wählen</h2>
           <MapboxComponent mapMarks={mapMarks} onComplete={handleMapMarks} center={{latitude: 50, longitude: 11}} />
-          <p>Please mark at least {minMapMarks} sections on the map.</p>
+          <p>Bitte markieren Sie mindestens {minMapMarks} Ihrer Felder auf der Karte.</p>
         </div>
       );
     } else if (currentPage <= mapMarks.length) {
       const markNumber = currentPage - 1;
       const mark = mapMarks[markNumber];
       const markQuestions = generateMarkQuestions(markNumber);
-      console.log("Mark: ", mark)
 
       return (
         <div>
@@ -104,20 +100,20 @@ const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
       <h1>Mapbox Survey</h1>
       {renderQuestions()}
       <div>
-        {currentPage === 0 && <button onClick={onBack}>Back to User Agreement</button>}
+        {currentPage === 0 && <button onClick={onBack}>Zurück zur Einverständniserklärung</button>}
         {currentPage > 0 && (
-          <button onClick={handlePreviousPage}>Previous Page</button>
+          <button onClick={handlePreviousPage}>Vorherige Seite</button>
         )}
-        {currentPage < mapMarks.length && (
+        {(currentPage < mapMarks.length || currentPage == 0) && (
           <button
             onClick={handleNextPage}
             disabled={mapMarks.length < minMapMarks}
           >
-            Next Page
+            Nächste Seite
           </button>
         )}
-        {currentPage === mapMarks.length && (
-          <button onClick={handleComplete}>Next Page</button>
+        {(currentPage === mapMarks.length && currentPage != 0) && (
+          <button onClick={handleComplete}>Nächste Seite</button>
         )}
       </div>
     </div>

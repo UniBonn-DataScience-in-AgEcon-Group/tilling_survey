@@ -65,16 +65,23 @@ function App() {
         <Home onToUserAgreement={handleToUserAgreement} />
       )}
       {showAgreement && (
-        <UserAgreement onAccept={handleAcceptAgreement} onBack={handleBackToHome} />
+        <UserAgreement onAccept={handleAcceptAgreement}
+          onBack={handleBackToHome}
+        />
       )}
       {showMapboxSurvey && (
         <MapboxSurvey onComplete={handleMapboxResponses}
-          onBack={handleBackToHome}
+          onBack={handleBackToAgreement}
           responses={responses}
-          updateResponses={setResponses} />
+          updateResponses={setResponses}
+        />
       )}
-      {/* Conditionally render the Survey component */}
-      {showSurvey && <Survey onBack={handleAcceptAgreement} responses={responses} updateResponses={setResponses} onComplete={handleSurveyResponses}/>}
+      {showSurvey &&
+        <Survey onBack={handleAcceptAgreement}
+          responses={responses}
+          updateResponses={setResponses}
+          onComplete={handleSurveyResponses}
+        />}
     </div>
   );
 }
