@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Map, { Marker } from "react-map-gl";
 
+import GeocoderControl from "./geocoder-control";
+
 import 'mapbox-gl/dist/mapbox-gl.css';
+
 
 const mapboxApiKey = import.meta.env.VITE_MAPBOX_API_KEY
 
@@ -42,8 +45,6 @@ const MapboxComponent = ({ onComplete, center, mapMarks, setCenter = false }) =>
     setMarks((prevMarks) => [...prevMarks, newMark]);
     setCurrentMark(currentMark + 1);
 
-    setViewState(evt.viewState)
-
     onComplete(marks);
   };
 
@@ -68,8 +69,8 @@ const MapboxComponent = ({ onComplete, center, mapMarks, setCenter = false }) =>
               <div className="marker">{mark.markNumber}</div>
             </Marker>
           ))}
+        <GeocoderControl mapboxAccessToken={mapboxApiKey} position="top-right" />
       </Map>
-
     </div>
   );
 };
