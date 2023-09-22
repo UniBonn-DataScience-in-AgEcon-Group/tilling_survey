@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import MapboxComponent from "./Mapbox.jsx";
+import MapboxComponent from "./Mapbox.tsx";
 
 const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
   const [currentPage, setCurrentPage] = useState(0);
