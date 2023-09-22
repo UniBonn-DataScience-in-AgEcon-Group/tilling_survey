@@ -77,7 +77,7 @@ const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
       return (
         <div>
           <h2>Questions for Mark {markNumber + 1}</h2>
-          <MapboxComponent mapMarks={mapMarks} center={mark} onComplete={handleMapMarks} />
+          <MapboxComponent mapMarks={mapMarks} center={mark} onComplete={handleMapMarks} setCenter={true} />
           {markQuestions.map((question) => (
             <div key={question.id}>
               <label>{question.text}</label>

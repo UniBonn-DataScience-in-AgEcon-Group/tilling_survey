@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import Map, { Marker, NavigationControl } from "react-map-gl";
+import Map, { Marker } from "react-map-gl";
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const mapboxApiKey = import.meta.env.VITE_MAPBOX_API_KEY
 
-const MapboxComponent = ({ onComplete, center, mapMarks }) => {
+const MapboxComponent = ({ onComplete, center, mapMarks, setCenter = false }) => {
   const [viewState, setViewState] = useState({
     latitude: center.latitude,
     longitude: center.longitude,
@@ -18,11 +18,13 @@ const MapboxComponent = ({ onComplete, center, mapMarks }) => {
   // useEffect because useState is asynchronous and didn't
   // center the viewport of the map correctly
   useEffect(() => {
+    if (setCenter) {
     setViewState((prevViewState) => ({
       ...prevViewState,
       latitude: center.latitude,
       longitude: center.longitude,
     }));
+    }
   }, [center]);
 
   // Same reason as above, just to enforce correct updating of marks
@@ -39,6 +41,8 @@ const MapboxComponent = ({ onComplete, center, mapMarks }) => {
 
     setMarks((prevMarks) => [...prevMarks, newMark]);
     setCurrentMark(currentMark + 1);
+
+    setViewState(evt.viewState)
 
     onComplete(marks);
   };
