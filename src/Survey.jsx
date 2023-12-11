@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import surveyQuestions from "./questions";
+import React, { useState, useEffect } from "react";
+import surveyQuestions from "./Questions";
 
-const Survey = ({ onBack }) => {
+const Survey = ({ onBack, appResponses, updateResponses, onComplete }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [responses, setResponses] = useState(Array(surveyQuestions.length).fill({}));
 
@@ -19,9 +19,8 @@ const Survey = ({ onBack }) => {
     setCurrentPage((prevPage) => prevPage - 1);
   };
 
-  const handleSubmit = () => {
-    // No backend integration currently, so just log the survey response for debugging
-    console.log(responses);
+  const handleComplete = () => {
+    onComplete(responses);
   };
 
   const renderQuestion = (question) => {
@@ -66,10 +65,10 @@ const Survey = ({ onBack }) => {
       <h1>Umfrage</h1>
       {surveyQuestions[currentPage].map(renderQuestion)}
       <div>
-        {currentPage == 0 && <button onClick={onBack}>Zur Einverständniserklärung</button>}
+        {currentPage == 0 && <button onClick={onBack}>Vorherige Seite</button>}
         {currentPage > 0 && <button onClick={handlePreviousPage}>Vorherige Seite</button>}
         {currentPage < surveyQuestions.length - 1 && <button onClick={handleNextPage}>Nächste Seite</button>}
-        {currentPage === surveyQuestions.length - 1 && <button onClick={handleSubmit}>Abschicken</button>}
+        {currentPage === surveyQuestions.length - 1 && <button onClick={handleComplete}>Abschicken</button>}
       </div>
     </div>
   );
