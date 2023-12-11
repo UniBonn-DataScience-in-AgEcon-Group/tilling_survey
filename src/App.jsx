@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Home from "./Home.jsx";
 import UserAgreement from "./UserAgreement.jsx";
-import MapboxSurvey from "./MapboxSurvey.jsx"; // Import the MapboxSurvey component
+import MapboxSurvey from "./MapboxSurvey.jsx";
 import Survey from "./Survey.jsx";
 import "./App.css"
 
