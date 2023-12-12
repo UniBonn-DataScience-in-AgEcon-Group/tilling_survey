@@ -13,8 +13,8 @@ const mapboxApiKey = import.meta.env.VITE_MAPBOX_API_KEY
 
 const MapboxComponent = ({ onComplete, center, mapMarks, setCenter = false }) => {
   const [viewState, setViewState] = useState({
-    latitude: center.latitude,
-    longitude: center.longitude,
+    latitude: center[1],
+    longitude: center[0],
     zoom: 7,
   });
 
@@ -23,34 +23,58 @@ const MapboxComponent = ({ onComplete, center, mapMarks, setCenter = false }) =>
     features: [],
   });
 
+  useEffect(() => {
+    onComplete(clickedPolygons);
+  }, [clickedPolygons, onComplete]);
+
   // useEffect because useState is asynchronous and didn't
   // center the viewport of the map correctly
   useEffect(() => {
     if (setCenter) {
     setViewState((prevViewState) => ({
       ...prevViewState,
-      latitude: center.latitude,
-      longitude: center.longitude,
+      latitude: center[1],
+      longitude: center[0],
     }));
     }
   }, [center]);
 
   const handlePolygonClick = (event) => {
-    const features = event.features;
+  const features = event.features;
 
-    if (features && features.length > 0) {
-      const clickedPolygon = features[0];
+  if (features && features.length > 0) {
+    const clickedPolygon = features[0];
 
-      // For some reason, toGeoJSON jumbles coords, so add manually
-      const geojson = clickedPolygon._vectorTileFeature.toGeoJSON();
-      geojson.geometry.coordinates = clickedPolygon.geometry.coordinates;
+    const geojson = clickedPolygon._vectorTileFeature.toGeoJSON();
+    // For some reason, toGeoJSON jumbles coords, so add manually
+    geojson.geometry.coordinates = clickedPolygon.geometry.coordinates;
 
-      setClickedPolygons((prevPolygons) => ({
-      ...prevPolygons,
-      features: [...prevPolygons.features, geojson],
-    }));
-    }
-  };
+    const currentPolygonId = clickedPolygon.properties.poly_id;
+
+    setClickedPolygons((prevPolygons) => {
+      const existingIndex = prevPolygons.features.findIndex(
+        (feature) => feature.properties.poly_id === currentPolygonId
+      );
+
+      if (existingIndex !== -1) {
+        // If the polygon with the same id exists, remove it
+        const updatedFeatures = [...prevPolygons.features];
+        updatedFeatures.splice(existingIndex, 1);
+
+        return {
+          ...prevPolygons,
+          features: updatedFeatures,
+        };
+      } else {
+        // If the polygon with the same id doesn't exist, add it
+        return {
+          ...prevPolygons,
+          features: [...prevPolygons.features, geojson],
+        };
+      }
+    });
+  }
+};
 
   const fieldLayerStyle: FillLayer = {
     id: 'plot-polygons',

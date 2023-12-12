@@ -55,7 +55,7 @@ function App() {
   const handleMapboxResponses = (mapboxResponses) => {
     const updatedResponses = { ...responses };
 
-    mapboxResponses.forEach((response, index) => {
+    mapboxResponses.features.forEach((response, index) => {
       // Create a key like "coords_0", "coords_1", etc.
       const key = `coords_${index}`;
       

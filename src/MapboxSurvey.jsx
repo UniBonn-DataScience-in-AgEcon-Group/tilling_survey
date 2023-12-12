@@ -19,7 +19,7 @@ const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
   };
 
   const handleComplete = () => {
-    if (mapMarks.length >= minMapMarks) {
+    if (mapMarks.features && mapMarks.features.length >= minMapMarks) {
       onComplete(mapMarks);
     }
   };
@@ -31,13 +31,14 @@ const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
     updateResponses(updatedResponses);
 
     // Continue updating other state or data as needed
-    const updatedMarks = [...mapMarks];
+    /*const updatedMarks = [...mapMarks];
     const updatedMark = { ...updatedMarks[markNumber] };
     const updatedMarkQuestions = { ...updatedMark.questions };
     updatedMarkQuestions[questionId] = value;
     updatedMark.questions = updatedMarkQuestions;
     updatedMarks[markNumber] = updatedMark;
     setMapMarks(updatedMarks);
+    */
   };
 
   // Function to generate fixed questions for a mark
@@ -65,19 +66,20 @@ const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
       return (
         <div>
           <h2>Felder wählen</h2>
-          <MapboxComponent mapMarks={mapMarks} onComplete={handleMapMarks} center={{latitude: 50, longitude: 11}} />
+          <MapboxComponent mapMarks={mapMarks} onComplete={handleMapMarks} center={[11, 50]} />
           <p>Bitte markieren Sie mindestens {minMapMarks} Ihrer Felder auf der Karte.</p>
         </div>
       );
-    } else if (currentPage <= mapMarks.length) {
+    } else if (currentPage <= mapMarks.features.length) {
       const markNumber = currentPage - 1;
       const mark = mapMarks[markNumber];
       const markQuestions = generateMarkQuestions(markNumber);
+      window.marks = mapMarks;
 
       return (
         <div>
           <h2>Questions for Mark {markNumber + 1}</h2>
-          <MapboxComponent mapMarks={mapMarks} center={mark} onComplete={handleMapMarks} setCenter={true} />
+          <MapboxComponent mapMarks={mapMarks} center={mapMarks.features[markNumber].geometry.coordinates[0][0]} onComplete={handleMapMarks} setCenter={true} />
           {markQuestions.map((question) => (
             <div key={question.id}>
               <label>{question.text}</label>
@@ -104,15 +106,15 @@ const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
         {currentPage > 0 && (
           <button onClick={handlePreviousPage}>Vorherige Seite</button>
         )}
-        {(currentPage < mapMarks.length || currentPage == 0) && (
+        {((mapMarks.features && currentPage < mapMarks.features.length) || currentPage == 0) && (
           <button
             onClick={handleNextPage}
-            disabled={mapMarks.length < minMapMarks}
+            disabled={!mapMarks.features || mapMarks.features.length < minMapMarks}
           >
             Nächste Seite
           </button>
         )}
-        {(currentPage === mapMarks.length && currentPage != 0) && (
+        {(mapMarks.features && currentPage === mapMarks.features.length && currentPage != 0) && (
           <button onClick={handleComplete}>Nächste Seite</button>
         )}
       </div>
