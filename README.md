@@ -21,6 +21,7 @@ To publish the site to GitHub Pages, you need to do the following:
 1. Ensure you have a .env file containing both a Mapbox API key and the database name. The syntax is:
 
 VITE_MAPBOX_API_KEY=ENTER_MAPBOX_KEY_HERE
+
 VITE_DB_NAME=ENTER_DB_LINK_HERE
 
 The site will not run without these.
