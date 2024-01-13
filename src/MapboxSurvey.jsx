@@ -75,7 +75,7 @@ const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
             <div key={question.id}>
               <label>{question.text}</label>
               <input
-                type="text"
+                type={question.type}
                 value={responses[question.id] || ""}
                 onChange={(e) =>
                   handleMapboxResponse(markNumber, question.id, e.target.value)
