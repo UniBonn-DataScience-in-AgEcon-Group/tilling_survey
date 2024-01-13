@@ -3,7 +3,7 @@ import MapboxComponent from "./Mapbox.tsx";
 
 const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
   const [currentPage, setCurrentPage] = useState(0);
-  const [mapMarks, setMapMarks] = useState([]);
+  const [mapMarks, setMapMarks] = useState(responses["coords"] || []);
   const minMapMarks = 3;
 
   const handleMapMarks = (marks) => {
@@ -28,17 +28,8 @@ const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
     // Update the responses object passed from App.jsx
     const updatedResponses = { ...responses };
     updatedResponses[questionId] = value;
+    updatedResponses["coords"] = mapMarks;
     updateResponses(updatedResponses);
-
-    // Continue updating other state or data as needed
-    /*const updatedMarks = [...mapMarks];
-    const updatedMark = { ...updatedMarks[markNumber] };
-    const updatedMarkQuestions = { ...updatedMark.questions };
-    updatedMarkQuestions[questionId] = value;
-    updatedMark.questions = updatedMarkQuestions;
-    updatedMarks[markNumber] = updatedMark;
-    setMapMarks(updatedMarks);
-    */
   };
 
   // Function to generate fixed questions for a mark
@@ -66,7 +57,7 @@ const MapboxSurvey = ({ onComplete, onBack, responses, updateResponses }) => {
       return (
         <div>
           <h2>Felder wählen</h2>
-          <MapboxComponent mapMarks={mapMarks} onComplete={handleMapMarks} center={[11, 50]} />
+          <MapboxComponent mapMarks={mapMarks} onComplete={handleMapMarks} center={[11, 50]}/>
           <p>Bitte markieren Sie mindestens {minMapMarks} Ihrer Felder auf der Karte.</p>
         </div>
       );

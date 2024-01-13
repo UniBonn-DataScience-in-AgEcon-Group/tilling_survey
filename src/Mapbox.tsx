@@ -18,10 +18,13 @@ const MapboxComponent = ({ onComplete, center, mapMarks, setCenter = false }) =>
     zoom: 7,
   });
 
-  const [clickedPolygons, setClickedPolygons] = useState<FeatureCollection>({
+  const [clickedPolygons, setClickedPolygons] = useState(mapMarks);
+  const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/outdoors-v12");
+
+  /*useState<FeatureCollection>({
     type: 'FeatureCollection',
     features: [],
-  });
+  });*/
 
   useEffect(() => {
     onComplete(clickedPolygons);
@@ -39,41 +42,50 @@ const MapboxComponent = ({ onComplete, center, mapMarks, setCenter = false }) =>
     }
   }, [center]);
 
+  const toggleMapStyle = () => {
+    setMapStyle(currentStyle => 
+      currentStyle === "mapbox://styles/mapbox/outdoors-v12"
+        ? "mapbox://styles/mapbox/satellite-streets-v12"
+        : "mapbox://styles/mapbox/outdoors-v12"
+    );
+  };
+
   const handlePolygonClick = (event) => {
-  const features = event.features;
+    const features = event.features;
 
-  if (features && features.length > 0) {
-    const clickedPolygon = features[0];
+    if (features && features.length > 0) {
+      const clickedPolygon = features[0];
 
-    const geojson = clickedPolygon._vectorTileFeature.toGeoJSON();
-    // For some reason, toGeoJSON jumbles coords, so add manually
-    geojson.geometry.coordinates = clickedPolygon.geometry.coordinates;
+      const geojson = clickedPolygon._vectorTileFeature.toGeoJSON();
+      // For some reason, toGeoJSON jumbles coords, so add manually
+      geojson.geometry.coordinates = clickedPolygon.geometry.coordinates;
 
-    const currentPolygonId = clickedPolygon.properties.poly_id;
+      const currentPolygonId = clickedPolygon.properties.poly_id;
 
-    setClickedPolygons((prevPolygons) => {
-      const existingIndex = prevPolygons.features.findIndex(
-        (feature) => feature.properties.poly_id === currentPolygonId
-      );
+      setClickedPolygons((prevPolygons) => {
+        const existingIndex = prevPolygons.features.findIndex(
+          (feature) => feature.properties.poly_id === currentPolygonId
+        );
 
-      if (existingIndex !== -1) {
-        // If the polygon with the same id exists, remove it
-        const updatedFeatures = [...prevPolygons.features];
-        updatedFeatures.splice(existingIndex, 1);
+        if (existingIndex !== -1) {
+          // If the polygon with the same id exists, remove it
+          const updatedFeatures = [...prevPolygons.features];
+          updatedFeatures.splice(existingIndex, 1);
 
-        return {
-          ...prevPolygons,
-          features: updatedFeatures,
-        };
-      } else {
-        // If the polygon with the same id doesn't exist, add it
-        return {
-          ...prevPolygons,
-          features: [...prevPolygons.features, geojson],
-        };
-      }
-    });
-  }
+          return {
+            ...prevPolygons,
+            features: updatedFeatures,
+          };
+        } else {
+          // If the polygon with the same id doesn't exist, add it
+          return {
+            ...prevPolygons,
+            features: [...prevPolygons.features, geojson],
+          };
+        }
+      });
+    }
+    onComplete(clickedPolygons);
 };
 
   const fieldLayerStyle: FillLayer = {
@@ -100,12 +112,12 @@ const MapboxComponent = ({ onComplete, center, mapMarks, setCenter = false }) =>
   };
 
   return (
-    <div>
+    <div style={{position: "relative"}}>
 
       <Map
         {...viewState}
         style={{width: 800, height: 600}}
-        mapStyle="mapbox://styles/mapbox/outdoors-v12" 
+        mapStyle={mapStyle}
         /* mapStyle="mapbox://styles/toffi/ckyn0rxbi8kj414qpssdlx2zt" */
         mapboxAccessToken={mapboxApiKey}
         onClick={handlePolygonClick}
@@ -122,6 +134,9 @@ const MapboxComponent = ({ onComplete, center, mapMarks, setCenter = false }) =>
         </Source>
 
       </Map>
+      <button onClick={toggleMapStyle} style={{ position: 'absolute', top: 2, left: 2, zIndex: 1 }}>
+        Kartentyp wechseln
+      </button>
     </div>
   );
 };

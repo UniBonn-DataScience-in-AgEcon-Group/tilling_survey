@@ -3,6 +3,8 @@ import Home from "./Home.jsx";
 import UserAgreement from "./UserAgreement.jsx";
 import MapboxSurvey from "./MapboxSurvey.jsx";
 import Survey from "./Survey.jsx";
+import surveyQuestions from "./Questions";
+import Completion from "./Completion.jsx";
 import "./App.css"
 import PouchDB from "pouchdb-browser";
 
@@ -12,8 +14,9 @@ function App() {
   const [showAgreement, setShowAgreement] = useState(false);
   const [showMapboxSurvey, setShowMapboxSurvey] = useState(false);
   const [showSurvey, setShowSurvey] = useState(false); // Add a flag for Survey
-  const [responses, setResponses] = useState({});
+  const [responses, setResponses] = useState({"coords": {features: [], type: "FeatureCollection"}, "survey_questions": Array(surveyQuestions.length).fill({})});
   const [db, setDb] = useState(null);
+  const [currentPage, setCurrentPage] = useState("homepage");
 
   useEffect(() => {
     // Initialize PouchDB with the database name
@@ -30,42 +33,32 @@ function App() {
     };
   }, []); // Empty dependency array to run this effect only once
 
-  const handleToUserAgreement = () => {
-    setShowAgreement(true);
+  const handleToAgreement = () => {
+    setCurrentPage("agreement");
   };
 
-  const handleAcceptAgreement = () => {
-    setShowAgreement(false);
-    setShowMapboxSurvey(true); // Show MapboxSurvey when the agreement is accepted
-    setShowSurvey(false);
+  const handleToHome = () => {
+    setCurrentPage("homepage");
   };
 
-  const handleBackToHome = () => {
-    setShowAgreement(false);
-    setShowMapboxSurvey(false); // Hide MapboxSurvey when going back to Home
-    setShowSurvey(false); // Hide Survey as well
-  };
+  const handleToCompletion = () => {
+    setCurrentPage("completion");
+  }
 
-  const handleBackToAgreement = () => {
-    setShowAgreement(true);
-    setShowMapboxSurvey(false); // Hide MapboxSurvey when going back to Agreement
-    setShowSurvey(false); // Hide Survey as well
-  };
+  const handleToSurvey = () => {
+    setCurrentPage("survey");
+  }
+
+  const handleToMapbox = () => {
+    setCurrentPage("mapbox");
+  }
 
   const handleMapboxResponses = (mapboxResponses) => {
     const updatedResponses = { ...responses };
-
-    mapboxResponses.features.forEach((response, index) => {
-      // Create a key like "coords_0", "coords_1", etc.
-      const key = `coords_${index}`;
-      
-      // Add the response data to the updatedResponses object
-      updatedResponses[key] = response;
-    });
+    updatedResponses["coords"] = mapboxResponses;
 
     setResponses(updatedResponses);
-    setShowSurvey(true);
-    setShowMapboxSurvey(false);
+    handleToSurvey();
   };
 
   const handleSurveyResponses = (surveyResponses) => {
@@ -74,48 +67,45 @@ function App() {
     setResponses(updatedResponses);
   }
 
-  const handleSubmitFinal = () => {
-    if (db) {
-      // Use the post method to add a new document with a generated ID
-      db.post(responses)
-        .then(response => {
-          console.log('Document saved successfully:', response);
-
-          // After posting, fetch and log all entries from the database
-          return db.allDocs({ include_docs: true });
-        })
-        .then(result => {
-          console.log('All entries in the database:', result.rows.map(row => row.doc));
-        })
-        .catch(error => {
-          console.error('Error saving or fetching documents:', error);
-        });
-    }
-  }
-
   return (
     <div className="App">
-      {!showAgreement && !showMapboxSurvey && !showSurvey && (
-        <Home onToUserAgreement={handleToUserAgreement} />
-      )}
-      {showAgreement && (
-        <UserAgreement onAccept={handleAcceptAgreement}
-          onBack={handleBackToHome}
-        />
-      )}
-      {showMapboxSurvey && (
-        <MapboxSurvey onComplete={handleMapboxResponses}
-          onBack={handleBackToAgreement}
-          responses={responses}
-          updateResponses={setResponses}
-        />
-      )}
-      {showSurvey &&
-        <Survey onBack={handleAcceptAgreement}
-          responses={responses}
-          updateResponses={setResponses}
-          onComplete={handleSubmitFinal}
-        />}
+      <header className="header">
+        <p>Header Platzhalter</p>
+      </header>
+
+      <div className="Content">
+          {currentPage === "homepage" && (
+            <Home onToUserAgreement={handleToAgreement} />
+          )}
+          {currentPage === "agreement" && (
+            <UserAgreement onAccept={handleToMapbox}
+              onBack={handleToHome}
+            />
+          )}
+          {currentPage === "mapbox" && (
+            <MapboxSurvey onComplete={handleMapboxResponses}
+              onBack={handleToAgreement}
+              responses={responses}
+              updateResponses={setResponses}
+            />
+          )}
+          {currentPage === "survey" &&
+            <Survey onBack={handleToMapbox}
+              responses={responses}
+              updateResponses={setResponses}
+              onComplete={handleToCompletion}
+          />}
+          {currentPage === "completion" &&
+            <Completion onBack={handleToSurvey}
+              appResponses={responses}
+              updateReponses={setResponses}
+              database={db}
+            />}
+      </div>
+
+      <footer className="footer">
+        <p>Footer Platzhalter</p>
+      </footer>  
     </div>
   );
 }
